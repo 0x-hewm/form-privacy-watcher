@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Form Privacy Watcher - 设置</title>
+</head>
+
+<body>
+    <!-- 通知容器 -->
+    <div id="notificationContainer" class="notification-container"></div>
+
+    <!-- 页面主容器 -->
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <header class="top-header">
+            <div class="header-brand">
+                <img src="icons/icon48.png" alt="Form Privacy Watcher" class="brand-logo">
+                <div class="brand-info">
+                    <h1 class="brand-title">Form Privacy Watcher</h1>
+                    <p class="brand-subtitle">表单隐私保护插件设置中心</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- 横向Tab导航 -->
+        <nav class="horizontal-tabs">
+            <div class="tabs-container">
+                <button class="tab-button active" data-tab="general">
+                    <span class="tab-icon">⚙️</span>
+                    <span class="tab-label">常规设置</span>
+                </button>
+                <button class="tab-button" data-tab="whitelist">
+                    <span class="tab-icon">🛡️</span>
+                    <span class="tab-label">白名单管理</span>
+                </button>
+                <button class="tab-button" data-tab="logs">
+                    <span class="tab-icon">📋</span>
+                    <span class="tab-label">检测日志</span>
+                </button>
+                <button class="tab-button" data-tab="stats">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-label">统计信息</span>
+                </button>
+                <button class="tab-button" data-tab="about">
+                    <span class="tab-icon">ℹ️</span>
+                    <span class="tab-label">关于</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="content-area">
+            <div class="content-wrapper">
+                <!-- 常规设置 Tab -->
+                <section class="tab-panel active" id="general">
+                    <div class="section-title">
+                        <h2>常规设置</h2>
+                        <p class="section-desc">配置Form Privacy Watcher的基本功能和行为设置</p>
+                    </div>
+
+                    <div class="settings-panel">
+                        <div class="settings-table-container">
+                            <table class="settings-table">
+                                <thead>
+                                    <tr>
+                                        <th>设置项</th>
+                                        <th>功能说明</th>
+                                        <th>当前状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>启用隐私监控</strong></td>
+                                        <td>开启后将监控页面中的表单数据访问行为，包括第三方脚本读取和网络传输</td>
+                                        <td><input type="checkbox" id="enabledSetting" class="toggle-switch" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>实时输入监控</strong></td>
+                                        <td>检测表单字段边输入边向后端发送的行为，及时发现数据泄露风险</td>
+                                        <td><input type="checkbox" id="realtimeMonitoringSetting" class="toggle-switch" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>记录检测日志</strong></td>
+                                        <td>保存检测到的隐私违规事件，用于后续分析和审计</td>
+                                        <td><input type="checkbox" id="loggingSetting" class="toggle-switch" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>桌面通知</strong></td>
+                                        <td>检测到高风险事件时显示桌面通知，确保及时获知威胁</td>
+                                        <td><input type="checkbox" id="notificationsSetting" class="toggle-switch" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>检测敏感度</strong></td>
+                                        <td>设置隐私风险检测的敏感程度，平衡安全性与误报率</td>
+                                        <td>
+                                            <select id="sensitivitySetting" class="form-select">
+                                                <option value="low">低 - 只检测明显的泄露</option>
+                                                <option value="medium" selected>中 - 平衡检测精度</option>
+                                                <option value="high">高 - 检测潜在风险</option>
+                                                <option value="strict">严格 - 最大化保护</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>最大日志条数</strong></td>
+                                        <td>限制本地存储的日志记录数量，避免占用过多存储空间</td>
+                                        <td><input type="number" id="maxLogsSetting" class="form-input" value="100" min="50" max="1000" step="50" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>数据脱敏</strong></td>
+                                        <td>在日志中自动脱敏敏感数据，保护隐私的同时保留分析价值</td>
+                                        <td><input type="checkbox" id="dataSanitizationSetting" class="toggle-switch" /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="actions-panel">
+                            <button class="btn btn-primary" id="saveSettings">
+                                <span class="btn-icon">💾</span>
+                                <span class="btn-text">保存设置</span>
+                            </button>
+                            <button class="btn btn-secondary" id="resetSettings">
+                                <span class="btn-icon">🔄</span>
+                                <span class="btn-text">重置为默认</span>
+                            </button>
+                            <button class="btn btn-outline" id="exportSettings">
+                                <span class="btn-icon">📤</span>
+                                <span class="btn-text">导出配置</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 白名单管理 Tab -->
+                <section class="tab-panel" id="whitelist">
+                    <div class="section-title">
+                        <h2>白名单管理</h2>
+                        <p class="section-desc">管理受信任的网站列表，对白名单中的网站将不进行隐私检测</p>
+                    </div>
+
+                    <div class="whitelist-info">
+                        <div class="info-card">
+                            <div class="info-header">
+                                <span class="info-icon">💡</span>
+                                <h4>白名单使用说明</h4>
+                            </div>
+                            <ul class="info-list">
+                                <li>添加到白名单的网站将不会触发隐私检测警告</li>
+                                <li>支持通配符匹配，如 *.example.com 匹配所有子域名</li>
+                                <li>可以指定特定路径，如 /login 仅对登录页面生效</li>
+                                <li>建议只将确实信任的网站添加到白名单中</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="whitelist-actions">
+                        <button class="btn btn-primary" id="addWhitelistEntry">
+                            <span class="btn-icon">➕</span>
+                            <span class="btn-text">添加站点</span>
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="whitelistSearch" class="search-input" placeholder="🔍 搜索白名单站点...">
+                        </div>
+                        <div class="whitelist-stats">
+                            <span class="stat-item">总计: <strong id="whitelistTotalCount">0</strong></span>
+                            <span class="stat-item">活跃: <strong id="whitelistActiveCount">0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="whitelist-content">
+                        <div class="table-container">
+                            <table class="whitelist-table" id="whitelistTable" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th>域名</th>
+                                        <th>路径</th>
+                                        <th>添加原因</th>
+                                        <th>添加时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="whitelistTableBody">
+                                    <!-- 动态生成内容 -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="empty-state" id="whitelistEmptyState" style="display: none;">
+                            <div class="empty-icon">🛡️</div>
+                            <h3>暂无白名单站点</h3>
+                            <p>请点击"➕ 添加站点"按钮来添加您信任的网站</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 检测日志 Tab -->
+                <section class="tab-panel" id="logs">
+                    <div class="section-title danger">
+                        <h2>检测日志</h2>
+                        <p class="section-desc">实时监控并分析检测到的所有隐私风险事件，保护您的数据安全</p>
+                    </div>
+
+                    <!-- 日志操作工具栏 -->
+                    <div class="logs-actions">
+                        <button class="btn btn-success" id="refreshLogs" title="刷新检测日志数据">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">刷新</span>
+                        </button>
+                        <button class="btn btn-primary" id="exportLogs">
+                            <span class="btn-icon">📤</span>
+                            <span class="btn-text">导出日志</span>
+                        </button>
+                        <button class="btn btn-danger" id="clearLogs">
+                            <span class="btn-icon">🗑️</span>
+                            <span class="btn-text">清空全部</span>
+                        </button>
+                    </div>
+
+                    <!-- 智能白名单建议 -->
+                    <div class="whitelist-suggestions" id="whitelistSuggestions" style="display: none;">
+                        <div class="suggestion-card">
+                            <div class="suggestion-header">
+                                <span class="suggestion-icon">🤖</span>
+                                <h4>智能白名单建议</h4>
+                                <button class="btn-small btn-secondary" id="dismissSuggestions">忽略全部</button>
+                            </div>
+                            <p>基于误报分析，我们建议将以下域名添加到白名单:</p>
+                            <div id="suggestionsList">
+                                <!-- 动态生成建议 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 筛选控制面板 -->
+                    <div class="logs-filters">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="filter-label">风险等级:</label>
+                                <select id="severityFilter" class="filter-select">
+                                    <option value="">全部</option>
+                                    <option value="critical">🔴 严重风险</option>
+                                    <option value="high">🟠 高风险</option>
+                                    <option value="medium">🟡 中等风险</option>
+                                    <option value="low">🟢 低风险</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">威胁类型:</label>
+                                <select id="typeFilter" class="filter-select">
+                                    <option value="">全部</option>
+                                    <option value="field-access">🔐 字段访问</option>
+                                    <option value="sensitive-field-access">🔐 敏感字段访问</option>
+                                    <option value="realtime-input">⚡ 实时输入传输</option>
+                                    <option value="third-party-read">🕵️ 第三方脚本读取</option>
+                                    <option value="cross-origin">🌐 跨域数据传输</option>
+                                    <option value="hidden-collection">👥 隐蔽数据收集</option>
+                                    <option value="form-hijack">🎯 表单劫持</option>
+                                    <option value="keylogger">⌨️ 键盘记录</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">时间范围:</label>
+                                <select id="timeFilter" class="filter-select">
+                                    <option value="">全部</option>
+                                    <option value="today">今天</option>
+                                    <option value="yesterday">昨天</option>
+                                    <option value="week">最近一周</option>
+                                    <option value="month">最近一月</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">来源网站:</label>
+                                <select id="sourceFilter" class="filter-select">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="filter-row">
+                            <div class="search-group">
+                                <input type="text" id="logsSearch" placeholder="🔍 搜索日志记录..." class="search-input">
+                                <button class="btn-icon-only" id="advancedSearch" title="高级搜索">
+                                    <span class="btn-icon">⚙️</span>
+                                </button>
+                            </div>
+
+                            <div class="options-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="deduplicationEnabled" checked class="checkbox-input">
+                                    <span class="checkbox-text">智能去重</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="hideFalsePositives" class="checkbox-input">
+                                    <span class="checkbox-text">隐藏误报</span>
+                                </label>
+                            </div>
+
+                            <div class="sort-group">
+                                <label class="filter-label">排序:</label>
+                                <select id="sortBy" class="filter-select-compact">
+                                    <option value="time-desc">时间 ↓</option>
+                                    <option value="time-asc">时间 ↑</option>
+                                    <option value="severity-desc">风险 ↓</option>
+                                    <option value="severity-asc">风险 ↑</option>
+                                    <option value="domain">网站</option>
+                                    <option value="source">来源</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 视图控制按钮 -->
+                    <div class="view-controls">
+                        <div class="view-buttons">
+                            <button class="view-btn active" id="viewDetailed" title="详细表格">
+                                <span class="view-icon">📄</span>
+                                <span class="view-text">详细</span>
+                            </button>
+                            <button class="view-btn" id="viewCompact" title="紧凑列表">
+                                <span class="view-icon">📋</span>
+                                <span class="view-text">紧凑</span>
+                            </button>
+                            <button class="view-btn" id="viewGrouped" title="分组统计">
+                                <span class="view-icon">📊</span>
+                                <span class="view-text">分组</span>
+                            </button>
+                        </div>
+                        <button class="btn btn-secondary" id="resetAllFilters">
+                            <span class="btn-icon">🔄</span>
+                            <span class="btn-text">重置筛选</span>
+                        </button>
+                    </div>
+
+                    <!-- 统计摘要 -->
+                    <div class="logs-summary">
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="summary-label">📊 总记录数</span>
+                                <span class="summary-value" id="totalLogsCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🔍 筛选结果</span>
+                                <span class="summary-value" id="filteredLogsCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">☑️ 已选择</span>
+                                <span class="summary-value" id="selectedCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">⚠️ 误报记录</span>
+                                <span class="summary-value" id="falsePositiveCount">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">⏰ 最近更新</span>
+                                <span class="summary-value" id="lastUpdateTime">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 日志表格 -->
+                    <div class="logs-table-container">
+                        <table class="logs-table" id="logsTable">
+                            <thead>
+                                <tr>
+                                    <th class="col-select">
+                                        <label class="checkbox-wrapper">
+                                            <input type="checkbox" id="selectAllCheckbox">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </th>
+                                    <th class="col-severity">🎯 风险等级</th>
+                                    <th class="col-type">📝 字段类型</th>
+                                    <th class="col-threat">🛡️ 威胁类型</th>
+                                    <th class="col-source">🌐 来源脚本</th>
+                                    <th class="col-target">🎯 目标网站</th>
+                                    <th class="col-data">🔐 泄露数据</th>
+                                    <th class="col-method">🔧 泄露方式</th>
+                                    <th class="col-time">⏰ 检测时间</th>
+                                    <th class="col-actions">⚙️ 操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsList">
+                                <!-- 动态生成内容 -->
+                            </tbody>
+                        </table>
+
+                        <!-- 空状态 -->
+                        <div class="empty-state" id="logsEmptyState" style="display: none;">
+                            <div class="empty-icon">📋</div>
+                            <h3>暂无检测日志</h3>
+                            <div id="loggingDisabledWarning" style="display: none;" class="warning-notice">
+                                <div class="warning-card">
+                                    <div class="warning-icon">⚠️</div>
+                                    <div class="warning-content">
+                                        <h4>日志记录已关闭</h4>
+                                        <p>要查看详细的检测日志，请在 <a href="#" onclick="document.querySelector('[data-tab=general]').click(); return false;">常规设置</a> 中启用"记录检测日志"选项。</p>
+                                        <button class="btn btn-primary" onclick="document.querySelector('[data-tab=general]').click();">
+                                            <span class="btn-icon">⚙️</span>
+                                            <span class="btn-text">前往设置</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 批量操作菜单 -->
+                        <div class="bulk-actions-menu" id="bulkActionMenu" style="display: none;">
+                            <div class="bulk-header">
+                                <span class="bulk-icon">☑️</span>
+                                <span class="bulk-text">已选择 <span id="bulkSelectedCount">0</span> 项</span>
+                            </div>
+                            <div class="bulk-buttons">
+                                <button class="btn btn-danger" id="bulkDelete">
+                                    <span class="btn-icon">🗑️</span>
+                                    <span class="btn-text">删除</span>
+                                </button>
+                                <button class="btn btn-warning" id="bulkMarkFalsePositive">
+                                    <span class="btn-icon">⚠️</span>
+                                    <span class="btn-text">标记误报</span>
+                                </button>
+                                <button class="btn btn-primary" id="bulkAddToWhitelist">
+                                    <span class="btn-icon">🛡️</span>
+                                    <span class="btn-text">加入白名单</span>
+                                </button>
+                                <button class="btn btn-secondary" id="bulkIgnoreType">
+                                    <span class="btn-icon">�</span>
+                                    <span class="btn-text">忽略同类</span>
+                                </button>
+                                <button class="btn btn-outline" id="cancelBulkSelection">
+                                    <span class="btn-icon">❌</span>
+                                    <span class="btn-text">取消选择</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 统计信息 Tab -->
+                <section class="tab-panel" id="stats">
+                    <div class="section-title info">
+                        <h2>统计信息</h2>
+                        <p class="section-desc">查看插件运行期间的各项统计数据</p>
+                    </div>
+                    <div class="stats-content">
+                        <!-- 统计表格，结构同原有内容，class 命名统一 -->
+                        <table border="1">
+                            <thead>
+                                <tr>
+                                    <th>总记录数</th>
+                                    <th>已过滤 (In-Memory)</th>
+                                    <th>已选择 (用于操作)</th>
+                                    <th>误报记录</th>
+                                    <th>最近更新</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="statsTotalRecords">0</td>
+                                    <td id="statsFilteredRecords">0</td>
+                                    <td id="statsSelectedCount">0</td>
+                                    <td id="statsFalsePositives">0</td>
+                                    <td id="statsLastUpdated">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 关于 Tab -->
+                <section class="tab-panel" id="about">
+                    <div class="section-title about">
+                        <h2>关于 Form Privacy Watcher</h2>
+                        <p class="section-desc">插件介绍、核心功能、隐私承诺与开源信息</p>
+                    </div>
+                    <div class="about-content-area">
+                        <!-- 插件介绍、功能列表、威胁类型、隐私承诺、外部链接等，结构同原有内容，class 命名统一 -->
+                        <div class="about-section card-style">
+                            <h3>🛡️ 插件介绍</h3>
+                            <p>Form Privacy Watcher
+                                是一款专注于保护用户表单数据隐私的浏览器插件。它能够实时监控网页中表单字段的访问行为，检测并提醒用户可能存在的数据泄露风险，特别是针对边输入边向后端发送数据的隐蔽行为。</p>
+                        </div>
+
+                        <div class="about-section card-style">
+                            <h3>⚡ 核心功能</h3>
+                            <div class="feature-grid">
+                                <div class="feature-item">
+                                    <p><strong>🔍 实时表单监控: </strong>监控所有表单字段的访问和修改行为</p>
+                                </div>
+                                <div class="feature-item">
+                                    <p><strong>⚡ 边输入边发送检测: </strong>检测表单字段在用户输入过程中向服务器发送数据的行为</p>
+                                </div>
+                                <div class="feature-item">
+                                    <p><strong>🕵️ 第三方脚本检测: </strong>识别第三方JavaScript脚本读取表单数据的行为</p>
+                                </div>
+                                <div class="feature-item">
+                                    <p><strong>🌐 网络请求分析: </strong>分析网络请求中包含的敏感表单数据</p>
+                                </div>
+                                <div class="feature-item">
+                                    <p><strong>🔒 智能数据脱敏: </strong>在记录日志时自动脱敏敏感信息</p>
+                                </div>
+                                <div class="feature-item">
+                                    <p><strong>🛡️ 白名单信任机制: </strong>支持设置可信任网站的白名单</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-section card-style">
+                            <h3>🚨 检测的威胁类型</h3>
+                            <div class="threat-list">
+                                <div class="threat-type">
+                                    <strong>键盘记录行为: </strong>检测脚本监听键盘事件并记录用户输入
+                                </div>
+                                <div class="threat-type">
+                                    <strong>实时数据传输: </strong>检测表单字段值在用户输入时实时向服务器发送
+                                </div>
+                                <div class="threat-type">
+                                    <strong>隐蔽数据收集: </strong>检测通过隐藏字段或异步请求收集数据的行为
+                                </div>
+                                <div class="threat-type">
+                                    <strong>跨域数据泄露: </strong>检测向第三方域名发送用户输入数据的行为
+                                </div>
+                                <div class="threat-type">
+                                    <strong>表单劫持攻击: </strong>检测恶意脚本修改表单提交地址的行为
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-section card-style">
+                            <h3>🔒 隐私承诺</h3>
+                            <div class="privacy-promises">
+                                <div class="promise-item">
+                                    <span class="promise-icon">✅</span>
+                                    <span>所有数据处理都在本地完成，不向任何服务器发送</span>
+                                </div>
+                                <div class="promise-item">
+                                    <span class="promise-icon">✅</span>
+                                    <span>不收集用户任何个人信息或浏览习惯</span>
+                                </div>
+                                <div class="promise-item">
+                                    <span class="promise-icon">✅</span>
+                                    <span>不与任何第三方服务或分析平台通信</span>
+                                </div>
+                                <div class="promise-item">
+                                    <span class="promise-icon">✅</span>
+                                    <span>插件完全开源，代码透明可审计</span>
+                                </div>
+                                <div class="promise-item">
+                                    <span class="promise-icon">✅</span>
+                                    <span>日志数据支持自动脱敏，保护用户隐私</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-links">
+                            <a href="https://github.com/0x-hewm/form-privacy-watcher" class="link-btn" target="_blank">
+                                📦 查看源代码
+                            </a>
+                            <a href="https://github.com/0x-hewm/form-privacy-watcher/issues" class="link-btn"
+                                target="_blank">
+                                🐛 报告问题
+                            </a>
+                            <a href="https://github.com/0x-hewm/form-privacy-watcher/blob/main/PRIVACY.md"
+                                class="link-btn" target="_blank">
+                                🔒 隐私政策
+                            </a>
+                            <a href="https://github.com/0x-hewm/form-privacy-watcher/wiki" class="link-btn"
+                                target="_blank">
+                                📚 使用指南
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- 添加白名单模态框 -->
+    <div class="modal" id="addWhitelistModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🛡️ 添加白名单站点</h3>
+                <button class="modal-close" id="whitelistModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="whitelistDomain">域名 <span style="color: #e53e3e;">*</span></label>
+                    <input type="text" id="whitelistDomain" class="input" placeholder="例如: example.com 或 *.example.com">
+                    <small>
+                        支持通配符匹配: <br>
+                        • <code>example.com</code> - 仅匹配该域名<br>
+                        • <code>*.example.com</code> - 匹配所有子域名<br>
+                        • <code>www.example.com</code> - 仅匹配www子域名
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="whitelistPath">路径（可选）</label>
+                    <input type="text" id="whitelistPath" class="input" placeholder="例如: /login 或 /user/*">
+                    <small>
+                        指定特定路径: <br>
+                        • <code>/login</code> - 仅对登录页面生效<br>
+                        • <code>/user/*</code> - 对用户相关页面生效<br>
+                        • 留空则对整个网站生效
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label for="whitelistReason">添加原因</label>
+                    <input type="text" id="whitelistReason" class="input" placeholder="例如: 公司内部系统、受信任的服务">
+                    <small>记录添加到白名单的原因，便于后续管理</small>
+                </div>
+
+                <div class="form-note">
+                    <div class="note-icon">⚠️</div>
+                    <div class="note-content">
+                        <strong>重要提醒: </strong>
+                        <p>添加到白名单的网站将不会进行隐私检测。请确保只添加您完全信任的网站，避免潜在的隐私风险。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="whitelistModalCancel">取消</button>
+                <button class="btn btn-primary" id="whitelistModalSave">
+                    <span class="btn-icon">🛡️</span> 添加到白名单
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="options.js"></script>
+</body>
+
+</html>

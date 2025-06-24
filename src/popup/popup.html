@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Form Privacy Watcher</title>
+</head>
+<body>
+    <div class="popup-container">
+        <header class="popup-header">
+            <div class="logo">
+                <img src="icons/icon32.png" alt="Form Privacy Watcher">
+                <h1>Form Privacy Watcher</h1>
+            </div>
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span class="status-text">监控中</span>
+            </div>
+        </header>
+
+        <main class="popup-content">
+            <!-- 统计面板 -->
+            <section class="stats-panel">
+                <div class="stat-item">
+                    <span class="stat-number" id="todayViolations">0</span>
+                    <span class="stat-label">今日检测</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="totalViolations">0</span>
+                    <span class="stat-label">总计检测</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="whitelistedSites">0</span>
+                    <span class="stat-label">白名单站点</span>
+                </div>
+            </section>
+
+            <!-- 当前页面状态 -->
+            <section class="current-page">
+                <h3>当前页面</h3>
+                <div class="page-info" id="pageInfo">
+                    <div class="page-url" id="currentUrl">正在加载...</div>
+                    <div class="page-status" id="pageStatus">
+                        <span class="status-badge safe">安全</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 最近违规 -->
+            <section class="recent-violations" id="recentViolations">
+                <h3>最近检测到的风险</h3>
+                <div class="violations-list" id="violationsList">
+                    <div class="no-violations">
+                        <img src="icons/shield-check.svg" alt="安全" class="no-violations-icon">
+                        <p>暂无隐私风险检测</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 快速操作 -->
+            <section class="quick-actions">
+                <button class="action-btn primary" id="addWhitelistBtn">
+                    <span class="icon">🛡️</span>
+                    信任此站点
+                </button>
+                <button class="action-btn secondary" id="viewLogsBtn">
+                    <span class="icon">📋</span>
+                    查看详细日志
+                </button>
+            </section>
+        </main>
+
+        <footer class="popup-footer">
+            <div class="footer-actions">
+                <button class="footer-btn" id="settingsBtn">⚙️ 设置</button>
+                <button class="footer-btn" id="helpBtn">❓ 帮助</button>
+                <div class="toggle-container">
+                    <label class="toggle">
+                        <input type="checkbox" id="enabledToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">启用监控</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 违规详情模态框 -->
+    <div class="modal" id="violationModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>隐私风险详情</h3>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- 动态内容 -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancel">关闭</button>
+                <button class="btn btn-primary" id="modalWhitelist">信任此站点</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

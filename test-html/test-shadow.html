@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Privacy Watcher Shadow DOM 测试</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f7f7fa; }
+    .test-block { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin: 2em 0; padding: 1.5em; }
+    .test-title { font-size: 1.2em; font-weight: bold; color: #2563eb; margin-bottom: 0.5em; }
+    .test-desc { color: #555; margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Shadow DOM 表单测试</h1>
+  <div id="shadow-root"></div>
+  <button onclick="addShadowForm()">添加动态Shadow表单</button>
+  <script>
+    const host = document.getElementById('shadow-root');
+    const shadow = host.attachShadow({mode: 'open'});
+    shadow.innerHTML = `
+      <div class='test-block'>
+        <div class='test-title'>静态Shadow表单</div>
+        <form>
+          <label>邮箱：<input type="email" name="email" value="shadow@test.com"></label>
+          <label>密码：<input type="password" name="password" value="shadowpwd"></label>
+          <button type="submit">提交</button>
+        </form>
+      </div>
+    `;
+    window.addShadowForm = function() {
+      const div = document.createElement('div');
+      div.className = 'test-block';
+      div.innerHTML = `
+        <div class='test-title'>动态Shadow表单</div>
+        <form>
+          <label>动态邮箱：<input type="email" name="email" value="shadow${Date.now()}@test.com"></label>
+          <label>动态密码：<input type="password" name="password" value="pwd${Date.now()}"></label>
+          <button type="submit">提交</button>
+        </form>
+      `;
+      shadow.appendChild(div);
+    }
+  </script>
+  <div class="test-block">
+    <div class="test-title">嵌套自定义元素</div>
+    <my-form-el></my-form-el>
+  </div>
+  <script>
+    class MyFormEl extends HTMLElement {
+      constructor() {
+        super();
+        const s = this.attachShadow({mode:'open'});
+        s.innerHTML = `
+          <form>
+            <label>自定义元素邮箱：<input type="email" name="email" value="custom@test.com"></label>
+            <label>自定义元素密码：<input type="password" name="password" value="custompwd"></label>
+            <button type="submit">提交</button>
+          </form>
+        `;
+      }
+    }
+    customElements.define('my-form-el', MyFormEl);
+  </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Privacy Watcher 原生HTML全功能测试</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f7f7fa; }
+    .test-block { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; margin: 2em 0; padding: 1.5em; }
+    .test-title { font-size: 1.2em; font-weight: bold; color: #2563eb; margin-bottom: 0.5em; }
+    .test-desc { color: #555; margin-bottom: 1em; }
+    label { display: block; margin: 0.5em 0 0.2em; }
+    input, select, button, textarea { margin-bottom: 1em; padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; }
+    button { background: #2563eb; color: #fff; border: none; cursor: pointer; }
+    button:hover { background: #1e40af; }
+    .result { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 0.5em; margin-top: 0.5em; border-radius: 4px; font-size: 0.95em; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Form Privacy Watcher 原生HTML全功能测试</h1>
+  <!-- 1. 敏感字段表单 -->
+  <div class="test-block">
+    <div class="test-title">敏感字段表单监控</div>
+    <div class="test-desc">邮箱、手机号、身份证、密码、信用卡、CVV 等敏感字段检测与脱敏。</div>
+    <form id="sensitiveForm" action="https://httpbin.org/post" method="post" target="_blank">
+      <label>邮箱：<input type="email" name="email" value="test@example.com"></label>
+      <label>手机号：<input type="tel" name="phone" value="13812345678"></label>
+      <label>身份证号：<input type="text" name="idcard" value="110101199001011234"></label>
+      <label>密码：<input type="password" name="password" value="123456"></label>
+      <label>信用卡号：<input type="text" name="creditCard" value="4111111111111111"></label>
+      <label>CVV：<input type="text" name="cvv" value="123"></label>
+      <button type="submit">提交表单（POST 到 httpbin）</button>
+    </form>
+  </div>
+  <!-- 2. 普通字段表单 -->
+  <div class="test-block">
+    <div class="test-title">普通字段表单（无敏感信息）</div>
+    <div class="test-desc">测试插件对普通表单的无干扰性。</div>
+    <form id="normalForm" action="https://httpbin.org/post" method="post" target="_blank">
+      <label>昵称：<input type="text" name="nickname" value="小明"></label>
+      <label>留言：<textarea name="message">你好，世界！</textarea></label>
+      <button type="submit">提交普通表单</button>
+    </form>
+  </div>
+  <!-- 3. 白名单测试 -->
+  <div class="test-block">
+    <div class="test-title">白名单域名测试</div>
+    <div class="test-desc">将本页面域名加入插件白名单后，表单监控应自动失效。</div>
+    <button onclick="alert('请在插件选项页将本页面域名加入白名单，然后重新测试表单监控功能。')">白名单操作说明</button>
+  </div>
+  <!-- 4. JS 发送敏感数据（XHR/Fetch） -->
+  <div class="test-block">
+    <div class="test-title">JS 发送敏感数据（XHR/Fetch）</div>
+    <div class="test-desc">通过 JS 主动发送敏感数据，测试插件对 XHR/Fetch 的拦截与检测。</div>
+    <button onclick="sendXHR()">发送敏感数据（XHR）</button>
+    <button onclick="sendFetch()">发送敏感数据（Fetch）</button>
+    <div id="jsSendResult" class="result"></div>
+    <script>
+      function sendXHR() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://httpbin.org/post');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {
+          document.getElementById('jsSendResult').textContent = 'XHR 返回: ' + xhr.status + ' ' + xhr.responseText.slice(0, 100) + '...';
+        };
+        xhr.send(JSON.stringify({
+          email: 'leak@example.com',
+          password: 'leakpwd',
+          phone: '13987654321'
+        }));
+      }
+      function sendFetch() {
+        fetch('https://httpbin.org/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idcard: '440301198506201567',
+            creditCard: '5555555555554444',
+            cvv: '321'
+          })
+        })
+        .then(r => r.json())
+        .then(data => {
+          document.getElementById('jsSendResult').textContent = 'Fetch 返回: ' + JSON.stringify(data).slice(0, 100) + '...';
+        });
+      }
+    </script>
+  </div>
+  <!-- 5. 跨域请求与参数回显 -->
+  <div class="test-block">
+    <div class="test-title">跨域请求与参数回显</div>
+    <div class="test-desc">测试插件对跨域请求、参数回显的监控。使用 httpbin.org/get?param=xxx</div>
+    <form id="crossForm" onsubmit="doCross(event)">
+      <label>自定义参数：<input type="text" name="param" value="testValue"></label>
+      <button type="submit">GET 查询（httpbin.org）</button>
+    </form>
+    <div id="crossResult" class="result"></div>
+    <script>
+      function doCross(e) {
+        e.preventDefault();
+        const val = document.querySelector('#crossForm input[name=param]').value;
+        fetch('https://httpbin.org/get?param=' + encodeURIComponent(val))
+          .then(r => r.json())
+          .then(data => {
+            document.getElementById('crossResult').textContent = 'GET 返回: ' + JSON.stringify(data).slice(0, 100) + '...';
+          });
+      }
+    </script>
+  </div>
+  <!-- 6. 获取当前用户 IP 地址 -->
+  <div class="test-block">
+    <div class="test-title">获取当前用户 IP 地址</div>
+    <div class="test-desc">测试插件对公开 API 请求的无干扰性。使用 ipify.org 获取公网 IP。</div>
+    <button onclick="getIP()">获取我的 IP</button>
+    <div id="ipResult" class="result"></div>
+    <script>
+      function getIP() {
+        fetch('https://api.ipify.org?format=json')
+          .then(r => r.json())
+          .then(data => {
+            document.getElementById('ipResult').textContent = '你的公网 IP: ' + data.ip;
+          });
+      }
+    </script>
+  </div>
+  <!-- 7. 复杂嵌套表单与动态表单 -->
+  <div class="test-block">
+    <div class="test-title">复杂嵌套与动态表单</div>
+    <div class="test-desc">测试插件对动态添加、嵌套表单的监控能力。</div>
+    <div id="dynamicForms"></div>
+    <button onclick="addDynamicForm()">添加动态表单</button>
+    <script>
+      let formCount = 0;
+      function addDynamicForm() {
+        formCount++;
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <form action="https://httpbin.org/post" method="post" target="_blank" style="margin-top:1em;">
+            <label>动态表单 #${formCount} - 邮箱：<input type="email" name="email" value="user${formCount}@test.com"></label>
+            <label>动态表单 #${formCount} - 密码：<input type="password" name="password" value="pwd${formCount}"></label>
+            <button type="submit">提交动态表单</button>
+          </form>
+        `;
+        document.getElementById('dynamicForms').appendChild(div);
+      }
+    </script>
+  </div>
+  <!-- 8. 边界与异常场景 -->
+  <div class="test-block">
+    <div class="test-title">边界与异常场景</div>
+    <div class="test-desc">空表单、无 name 字段、超长字段、特殊字符、readonly、disabled、重置、移除、隐藏、网络异常等。</div>
+    <form id="edgeForm" action="https://httpbin.org/post" method="post" target="_blank">
+      <label>无 name 字段：<input type="text"></label>
+      <label>超长字段：<input type="text" name="longfield" value="这是一段超长文本，用于测试表单字段长度限制，超过一定长度后应被截断或处理。"></label>
+      <label>特殊字符：<input type="text" name="specialchars" value="!@#$%^&*()_+|"></label>
+      <label>只读字段：<input type="text" name="readonlyfield" value="只读内容" readonly></label>
+      <label>禁用字段：<input type="text" name="disabledfield" value="禁用内容" disabled></label>
+      <button type="submit">提交边界表单</button>
+    </form>
+  </div>
+  <!-- 9. 网络异常与恢复 -->
+  <div class="test-block">
+    <div class="test-title">网络异常与恢复</div>
+    <div class="test-desc">测试插件在网络异常情况下的表现及恢复能力。</div>
+    <button onclick="simulateNetworkError()">模拟网络异常</button>
+    <button onclick="recoverNetwork()">恢复网络</button>
+    <div id="networkResult" class="result"></div>
+    <script>
+      let originalFetch = window.fetch;
+      function simulateNetworkError() {
+        window.fetch = function() {
+          return new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('网络异常模拟')), 1000);
+          });
+        };
+        document.getElementById('networkResult').textContent = '已模拟网络异常，请求将失败。';
+      }
+      function recoverNetwork() {
+        window.fetch = originalFetch;
+        document.getElementById('networkResult').textContent = '网络已恢复，请求可以正常进行。';
+      }
+    </script>
+  </div>
+  <!-- 10. 性能测试 -->
+  <div class="test-block">
+    <div class="test-title">性能测试</div>
+    <div class="test-desc">测试表单提交的性能，包括响应时间、吞吐量等。</div>
+    <button onclick="startPerformanceTest()">开始性能测试</button>
+    <div id="performanceResult" class="result"></div>
+    <script>
+      function startPerformanceTest() {
+        const start = performance.now();
+        fetch('https://httpbin.org/post', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ test: '性能测试' })
+        })
+        .then(r => r.json())
+        .then(data => {
+          const end = performance.now();
+          document.getElementById('performanceResult').textContent = '响应时间: ' + (end - start).toFixed(2) + ' 毫秒';
+        });
+      }
+    </script>
+  </div>
+  <!-- 11. 兼容性测试 -->
+  <div class="test-block">
+    <div class="test-title">兼容性测试</div>
+    <div class="test-desc">测试在不同浏览器、设备上的兼容性。</div>
+    <button onclick="alert('请在不同浏览器、设备上打开此页面，测试表单功能与样式的兼容性。')">兼容性测试说明</button>
+  </div>
+  <!-- 12. 插件冲突测试 -->
+  <div class="test-block">
+    <div class="test-title">插件冲突测试</div>
+    <div class="test-desc">测试与其他浏览器插件的兼容性。</div>
+    <button onclick="alert('请同时启用其他插件，测试表单功能是否正常。如有冲突，请反馈给我们。')">插件冲突测试说明</button>
+  </div>
+  <!-- 13. 数据持久化测试 -->
+  <div class="test-block">
+    <div class="test-title">数据持久化测试</div>
+    <div class="test-desc">测试表单数据在不同会话、重启后的持久化。</div>
+    <button onclick="testPersistence()">测试数据持久化</button>
+    <div id="persistenceResult" class="result"></div>
+    <script>
+      function testPersistence() {
+        const formData = { test: '持久化测试' };
+        localStorage.setItem('testFormData', JSON.stringify(formData));
+        document.getElementById('persistenceResult').textContent = '数据已保存至本地存储。请刷新页面或重启浏览器后再来查看。';
+      }
+    </script>
+  </div>
+  <!-- 14. 安全性测试 -->
+  <div class="test-block">
+    <div class="test-title">安全性测试</div>
+    <div class="test-desc">测试常见安全漏洞的防护能力。</div>
+    <button onclick="alert('请尝试输入以下内容到表单中，测试安全性：\\n1. <script>alert(1)</script>\\n2. SELECT * FROM users; --\\n3. 12345678901234567890')">安全性测试说明</button>
+  </div>
+  <!-- 15. 反馈与支持 -->
+  <div class="test-block">
+    <div class="test-title">反馈与支持</div>
+    <div class="test-desc">如遇问题或有建议，请通过以下方式联系我们。</div>
+    <button onclick="alert('反馈邮箱：support@example.com\\n感谢您的支持与反馈！')">联系我们</button>
+  </div>
+</body>
+</html>
