@@ -160,7 +160,7 @@
           fields.push(name);
         }
       });
-    } catch (e) {
+    } catch {
       // 兼容性处理
       console.debug('FormData.entries() not supported');
     }
@@ -189,28 +189,6 @@
     }
     
     return selector;
-  }
-
-  function checkIfThirdParty(stackTrace: string): boolean {
-    const currentOrigin = window.location.origin;
-    const lines = stackTrace.split('\n');
-    
-    for (const line of lines) {
-      const urlMatch = line.match(/https?:\/\/[^\/\s)]+/);
-      if (urlMatch) {
-        const url = urlMatch[0];
-        try {
-          const urlOrigin = new URL(url).origin;
-          if (urlOrigin !== currentOrigin) {
-            return true;
-          }
-        } catch (e) {
-          // 忽略无效URL
-        }
-      }
-    }
-    
-    return false;
   }
 
   // 监控网络请求中的数据传输
@@ -247,7 +225,7 @@
     } else if (body && typeof body === 'object') {
       try {
         bodyStr = JSON.stringify(body);
-      } catch (e) {
+      } catch {
         return;
       }
     }

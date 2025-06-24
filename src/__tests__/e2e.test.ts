@@ -30,9 +30,6 @@ describe('端到端测试 - 表单隐私监控', () => {
       </form>
     `;
     
-    const form = container.querySelector('#testForm') as HTMLFormElement;
-    const formData = new FormData(form);
-    
     // 测试各种敏感字段
     expect(DataSanitizer.isSensitive('password')).toBe(true);
     expect(DataSanitizer.isSensitive('email')).toBe(true);

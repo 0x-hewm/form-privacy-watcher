@@ -40,7 +40,7 @@ const mockChrome = {
   }
 };
 
-// @ts-ignore
+// @ts-expect-error - Setting global chrome mock for testing
 global.chrome = mockChrome;
 
 // Mock window.postMessage

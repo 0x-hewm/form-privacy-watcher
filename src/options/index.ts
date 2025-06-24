@@ -934,7 +934,6 @@ class OptionsController {
     const timeStr = new Date(violation.timestamp).toLocaleTimeString();
     const severityClass = violation.severity;
     const threatType = this.determineThreatType(violation);
-    const sourceDomain = violation.scriptOrigin ? this.extractDomain(violation.scriptOrigin) : '直接访问';
     
     return `
       <tr class="log-item compact-item ${this.falsePositiveReports.has(violation.id) ? 'false-positive' : ''}" data-id="${violation.id}">
@@ -1082,7 +1081,6 @@ class OptionsController {
 
     try {
       const enabledSetting = document.getElementById('enabledSetting') as HTMLInputElement;
-      const realtimeMonitoringSetting = document.getElementById('realtimeMonitoringSetting') as HTMLInputElement;
       const loggingSetting = document.getElementById('loggingSetting') as HTMLInputElement;
       const notificationsSetting = document.getElementById('notificationsSetting') as HTMLInputElement;
       const sensitivitySetting = document.getElementById('sensitivitySetting') as HTMLSelectElement;
@@ -1745,7 +1743,7 @@ class OptionsController {
     }
   }
 
-  private handleRuntimeMessage(message: any, sender: any, sendResponse: any): void {
+  private handleRuntimeMessage(message: any, _sender: any, _sendResponse: any): void {
     if (message.type === 'PRIVACY_VIOLATION_DETECTED') {
       this.violations.push(message.data);
       if (this.deduplicationEnabled) {

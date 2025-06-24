@@ -1,5 +1,4 @@
 import { FormField, AccessEvent, Message } from '@/types';
-import { DataSanitizer } from '@/utils/dataSanitizer';
 
 class FormMonitor {
   private formFields: Map<string, FormField> = new Map();
@@ -85,7 +84,7 @@ class FormMonitor {
     });
   }
 
-  private generateFieldId(element: Element): string {
+  private generateFieldId(_element: Element): string {
     return `field_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 

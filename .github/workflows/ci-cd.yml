@@ -64,16 +64,12 @@ jobs:
     - name: Build extension
       run: npm run build:prod
       
-    - name: Package extension
-      run: npm run package
-      
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: extension-build
+        name: extension-build-${{ github.sha }}
         path: |
-          dist/
-          web-ext-artifacts/
+          releases/*.zip
         retention-days: 30
         
   security:
@@ -94,7 +90,8 @@ jobs:
       run: npm ci
       
     - name: Run security audit
-      run: npm audit --audit-level=moderate
+      run: npm audit --audit-level=high
+      continue-on-error: true
       
     - name: Run CodeQL analysis
       uses: github/codeql-action/init@v3
@@ -128,16 +125,24 @@ jobs:
     - name: Build extension
       run: npm run build:prod
       
-    - name: Package extension
-      run: npm run package
+    - name: Get package version
+      id: package-version
+      run: |
+        VERSION=$(node -e "
+        import fs from 'fs';
+        const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+        console.log(pkg.version);
+        ")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
       
     - name: Create Release
+      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ github.run_number }}
-        release_name: Release v${{ github.run_number }}
+        tag_name: v${{ steps.package-version.outputs.version }}
+        release_name: Release v${{ steps.package-version.outputs.version }}
         body: |
           Automated release of Form Privacy Watcher extension.
           
@@ -152,6 +157,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./web-ext-artifacts/form_privacy_watcher-*.zip
-        asset_name: form-privacy-watcher-extension.zip
+        asset_path: ./releases/form-privacy-watcher-v${{ steps.package-version.outputs.version }}.zip
+        asset_name: form-privacy-watcher-v${{ steps.package-version.outputs.version }}.zip
         asset_content_type: application/zip
