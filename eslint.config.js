@@ -31,10 +31,10 @@ export default [
     rules: {
       ...tsPlugin.configs.recommended.rules,
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off', // 关闭any类型警告
       'prefer-const': 'error',
       'no-var': 'error',
-      'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
+      'no-console': 'off', // 关闭console警告
       'no-undef': 'off', // TypeScript handles this
       'no-case-declarations': 'off', // Allow let/const in case blocks
       'no-useless-escape': 'warn'
@@ -82,14 +82,22 @@ export default [
     }
   },
   {
-    files: ['scripts/**/*.js', 'webpack.config.js', 'jest.config.cjs'],
+    files: ['scripts/**/*.js', 'scripts/**/*.cjs', 'webpack.config.js', 'jest.config.cjs'],
     languageOptions: {
       ecmaVersion: 2020,
-      sourceType: 'module',
+      sourceType: 'script',
       globals: {
+        require: 'readonly',
+        module: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
         console: 'readonly',
         process: 'readonly'
       }
+    },
+    rules: {
+      'no-undef': 'off',
+      'no-console': 'off'
     }
   }
 ];

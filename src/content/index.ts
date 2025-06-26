@@ -167,7 +167,7 @@ class FormMonitor {
     const lines = stack.split('\n');
     for (const line of lines) {
       if (line.includes('http')) {
-        const match = line.match(/https?:\/\/[^\/\s]+/);
+        const match = line.match(/https?:\/\/[^/\s]+/);
         if (match) {
           return match[0];
         }

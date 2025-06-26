@@ -70,9 +70,7 @@ try {
   }
   
   console.log(`\n🚀 发布提示:`);
-  console.log(`1. 访问 Chrome Web Store Developer Dashboard`);
-  console.log(`2. 上传文件: ${zipFileName}`);
-  console.log(`3. 填写商店信息并提交审核`);
+  console.log(`文件为: ${zipFileName}`);
   
 } catch (error) {
   console.error(`❌ 创建zip包失败:`, error.message);
